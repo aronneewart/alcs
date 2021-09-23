@@ -1,0 +1,7 @@
+root:!:0:root
+adm:x:3:rcs
+wheel:x:7:rcs
+uucp:x:11:rcs,cs
+rcs:x:1000:
+cs:x:1001:
+
