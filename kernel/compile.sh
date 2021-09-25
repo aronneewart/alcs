@@ -10,7 +10,6 @@ PATCHES=(
   0002-gcc-plugins-modern-gcc-plugin-infrastructure-requres.patch
 )
 
-
 err_report() {
     echo "Error on line $1"
 }
@@ -46,7 +45,6 @@ done
 if [[ -v PARAM_HELP ]]; then 
   echo "$0 [ -c ] [ -h ]
 
--d,   --device          USB device where to extract the ISO (e.g. /dev/sdb) 
 -c,   --config          Kernel config file path (default: ./config)
 -j,   --jobs            Makefile 'jobs' parameter for parallelization
 -h,   --help            This window
@@ -65,21 +63,6 @@ echo ""
 # Checking parameters
 # -------------------
 echo "Checking parameters ..."
-
-# USB device 
-# if [[ -z ${DEVICE} ]] 
-# then
-#   echo "USB device parameter not set!"
-#   exit -1
-# elif [[ ! -e "${DEVICE}" ]]
-# then
-#   echo "USB device '${DEVICE}' does not exist!"
-#   exit -1
-# elif $(cat /proc/mounts | grep -q "${DEVICE}")
-# then
-#   echo "USB device '${DEVICE}' is mounted! Please unmount it and try again."
-#   exit -1
-# fi 
 
 # Kernel config file
 if [[ ! -f "${FILE_CONFIG}" ]]
@@ -131,7 +114,11 @@ then
 fi
 
 # Extract tar
-rm -rf "linux-${RELEASE}"
+if [[ -d "linux-${RELEASE}" ]]
+then
+  echo "Removing old linux-${RELEASE} dir..."
+  rm -rf "linux-${RELEASE}"
+fi
 
 echo "Extracting linux-${RELEASE}.tar..."
 tar -xvf linux-${RELEASE}.tar
@@ -167,22 +154,16 @@ echo "Compiling kernel..."
 make ARCH=x86_64 -j${MAKE_JOBS}
 
 echo "Copying kernel to archiso airootfs/boot dir..."
-cp arch/x86_64/boot/bzImage "../../archiso/source/baseline/airootfs/boot/vmlinuz-${LOCALVERSION}"
+cp arch/x86_64/boot/bzImage "../../archiso/source/baseline/airootfs/boot/vmlinuz-linux"
 
 # Build modules
 echo "Building kernel modules..."
-make ARCH=x86_64 INSTALL_MOD_PATH=./modules_lib modules
+make ARCH=x86_64 INSTALL_MOD_PATH=../../archiso/source/baseline/airootfs/usr modules
 
 echo "Installing kernel modules..."
-make ARCH=x86_64 INSTALL_MOD_PATH=./modules_lib modules_install
+make ARCH=x86_64 INSTALL_MOD_PATH=../../archiso/source/baseline/airootfs/usr modules_install
 
 # Creates the initramfs img
-echo "Creating initramfs image..."
-mkinitcpio -k "${RELEASE}${LOCALVERSION}" -g "../../archiso/source/baseline/airootfs/boot/initramfs-${LOCALVERSION}.img" -r ./modules_lib
-
-
-
-
-
-
-
+# NOTE: Archiso does this action on its own
+# echo "Creating initramfs image..."
+# mkinitcpio -k "${RELEASE}${LOCALVERSION}" -g "../../archiso/source/baseline/airootfs/boot/initramfs-linux.img" -r ../../archiso/source/baseline/airootfs/usr
