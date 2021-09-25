@@ -38,6 +38,7 @@ mdadm
 memtest86+
 mkinitcpio
 mkinitcpio-archiso
+linux-lts
 openssh
 pv
 sudo

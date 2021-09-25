@@ -2,7 +2,7 @@
 
 PRESETS=('archiso')
 
-ALL_kver='/boot/vmlinuz-linux-cs'
+ALL_kver='/boot/vmlinuz-linux-lts'
 ALL_config='/etc/mkinitcpio.conf'
 
-archiso_image="/boot/initramfs-linux-cs.img"
+archiso_image="/boot/initramfs-linux-lts.img"
